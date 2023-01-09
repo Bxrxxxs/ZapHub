@@ -1,0 +1,424 @@
+--Window
+local ZapLib = loadstring(game:HttpGet(('https://pastebin.com/raw/MgUP7ANW')))()
+local Window = ZapLib:MakeWindow({Name = "ZapHub | 🌋 STEEP STEPS [800m] (!! Zap#0759)", IntroText = "ZapHub", IntroIcon = "rbxassetid://12102360541", HidePremium = false, SaveConfig = false})
+
+--Notifying
+ZapLib:MakeNotification({
+	Name = "Welcome to ZapHub!",
+	Content = "Discord: discord.gg/zaphub",
+	Image = "rbxassetid://12102363922",
+	Time = 10
+})
+
+--Tabs
+local Misc = Window:MakeTab({
+	Name = "Misc",
+	Icon = "rbxassetid://12102367320",
+	PremiumOnly = false
+})
+
+local Teleport = Window:MakeTab({
+	Name = "Teleport",
+	Icon = "rbxassetid://12102368940",
+	PremiumOnly = false
+})
+
+local Credits = Window:MakeTab({
+	Name = "Credits",
+	Icon = "rbxassetid://12102365116",
+	PremiumOnly = false
+})
+
+local UpdateLog = Window:MakeTab({
+	Name = "Update Log",
+	Icon = "rbxassetid://12102368069",
+	PremiumOnly = false
+})
+
+
+--In Misc Tab
+Misc:AddParagraph("Caution","Be careful when using 'Click to Teleport', the game has added invisible walls that can make you fall or return when you use it.")
+
+Misc:AddButton({
+	Name = "Fps Booster",
+	Default = false,
+	Callback = function(Value)
+		_G.Settings = {
+            Players = {
+                ["Ignore Me"] = true, -- Ignore your Character
+                ["Ignore Others"] = true-- Ignore other Characters
+            },
+            Meshes = {
+                Destroy = false, -- Destroy Meshes
+                LowDetail = true -- Low detail meshes (NOT SURE IT DOES ANYTHING)
+            },
+            Images = {
+                Invisible = true, -- Invisible Images
+                LowDetail = false, -- Low detail images (NOT SURE IT DOES ANYTHING)
+                Destroy = false, -- Destroy Images
+            },
+            ["No Particles"] = true, -- Disables all ParticleEmitter, Trail, Smoke, Fire and Sparkles
+            ["No Camera Effects"] = true, -- Disables all PostEffect's (Camera/Lighting Effects)
+            ["No Explosions"] = true, -- Makes Explosion's invisible
+            ["No Clothes"] = true, -- Removes Clothing from the game
+            ["Low Water Graphics"] = true, -- Removes Water Quality
+            ["No Shadows"] = true, -- Remove Shadows
+            ["Low Rendering"] = true, -- Lower Rendering
+            ["Low Quality Parts"] = true -- Lower quality parts
+        }
+        local Players = game:GetService("Players")
+        local BadInstances = {"DataModelMesh", "FaceInstance", "ParticleEmitter", "Trail", "Smoke", "Fire", "Sparkles", "PostEffect", "Explosion", "Clothing", "BasePart"}
+        local CanBeEnabled = {"ParticleEmitter", "Trail", "Smoke", "Fire", "Sparkles", "PostEffect"}
+        local function PartOfCharacter(Instance)
+            for i, v in pairs(Players:GetPlayers()) do
+                if v.Character and Instance:IsDescendantOf(v.Character) then
+                    return true
+                end
+            end
+            return false
+        end
+        local function ReturnDescendants()
+            local Descendants = {}
+            WaitNumber = 5000
+            if _G.Settings.Players["Ignore Others"] then
+                for i, v in pairs(game:GetDescendants()) do
+                    if not v:IsDescendantOf(Players) and not PartOfCharacter(v) then
+                        for i2, v2 in pairs(BadInstances) do
+                            if v:IsA(v2) then
+                                table.insert(Descendants, v)
+                            end
+                        end
+                    end
+                    if i == WaitNumber then
+                        task.wait()
+                        WaitNumber = WaitNumber + 5000
+                    end
+                end
+            elseif _G.Settings.Players["Ignore Me"] then
+                for i, v in pairs(game:GetDescendants()) do
+                    if not v:IsDescendantOf(Players) and not v:IsDescendantOf(ME.Character) then
+                        for i2, v2 in pairs(BadInstances) do
+                            if v:IsA(v2) then
+                                table.insert(Descendants, v)
+                            end
+                        end
+                    end
+                    if i == WaitNumber then
+                        task.wait()
+                        WaitNumber = WaitNumber + 5000
+                    end
+                end
+            end
+            return Descendants
+        end
+        local function CheckIfBad(Instance)
+            if not Instance:IsDescendantOf(Players) and not PartOfCharacter(Instance) then
+                if Instance:IsA("DataModelMesh") then
+                    if _G.Settings.Meshes.LowDetail then
+                        sethiddenproperty(Instance, "LODX", Enum.LevelOfDetailSetting.Low)
+                        sethiddenproperty(Instance, "LODY", Enum.LevelOfDetailSetting.Low)
+                    elseif _G.Settings.Meshes.Destroy then
+                        Instance:Destroy()
+                    end
+                elseif Instance:IsA("FaceInstance") then
+                    if _G.Settings.Images.Invisible then
+                        Instance.Transparency = 1
+                    elseif _G.Settings.Images.LowDetail then
+                        Instance.Shiny = 1
+                    elseif _G.Settings.Images.Destroy then
+                        Instance:Destroy()
+                    end
+                elseif table.find(CanBeEnabled, Instance.ClassName) then
+                    if _G.Settings["No Particles"] or (_G.Settings.Other and _G.Settings.Other["No Particles"]) then
+                        Instance.Enabled = false
+                    end
+                elseif Instance:IsA("Explosion") then
+                    if _G.Settings["No Explosions"] or (_G.Settings.Other and _G.Settings.Other["No Explosions"]) then
+                        Instance.Visible = false
+                    end
+                elseif Instance:IsA("Clothing") then
+                    if _G.Settings["No Clothes"] or (_G.Settings.Other and _G.Settings.Other["No Clothes"]) then
+                        Instance:Destroy()
+                    end
+                elseif Instance:IsA("BasePart") then
+                    if _G.Settings["Low Quality Parts"] or (_G.Settings.Other and _G.Settings.Other["Low Quality Parts"]) then
+                        Instance.Material = Enum.Material.Plastic
+                        Instance.Reflectance = 0
+                    end
+                end
+            end
+        end
+        if _G.Settings["Low Water Graphics"] or (_G.Settings.Other and _G.Settings.Other["Low Water Graphics"]) then
+            workspace:FindFirstChildOfClass("Terrain").WaterWaveSize = 0
+            workspace:FindFirstChildOfClass("Terrain").WaterWaveSpeed = 0
+            workspace:FindFirstChildOfClass("Terrain").WaterReflectance = 0
+            workspace:FindFirstChildOfClass("Terrain").WaterTransparency = 0
+        end
+        if _G.Settings["No Shadows"] or (_G.Settings.Other and _G.Settings.Other["No Shadows"]) then
+            game:GetService("Lighting").GlobalShadows = false
+            game:GetService("Lighting").FogEnd = 9e9
+        end
+        if _G.Settings["Low Rendering"] or (_G.Settings.Other and _G.Settings.Other["Low Rendering"]) then
+            settings().Rendering.QualityLevel = 1
+        end
+        ZapLib:MakeNotification({
+            Name = "Loading Fps Booster",
+            Content = "Discord: discord.gg/zaphub",
+            Image = "rbxassetid://12102363922",
+            Time = 5
+        })
+        local Descendants = ReturnDescendants()
+        local WaitNumber = 500
+        ZapLib:MakeNotification({
+            Name = "Checking " .. #Descendants .. " Instances...",
+            Content = "Discord: discord.gg/zaphub",
+            Image = "rbxassetid://12102363922",
+            Time = 5
+        })
+        for i, v in pairs(Descendants) do
+            CheckIfBad(v)
+            print("Loaded " .. i .. "/" .. #Descendants)
+            if i == WaitNumber then
+                task.wait()
+                WaitNumber = WaitNumber + 500
+            end
+        end
+        ZapLib:MakeNotification({
+            Name = "Fps Booster Loaded",
+            Content = "Discord: discord.gg/zaphub",
+            Image = "rbxassetid://12102363922",
+            Time = 5
+        })
+        game.DescendantAdded:Connect(CheckIfBad)
+    end
+})
+
+Misc:AddButton({
+	Name = "Delete Fog",
+	Default = false,
+	Callback = function(Value)
+		game.Lighting.Fog:Destroy()
+	end	  
+})
+
+Misc:AddButton({
+	Name = "Non Slippery Ice",
+	Default = false,
+	Callback = function(Value)
+		for i,v in pairs(game.Workspace.Map.SpecialParts:GetChildren()) do
+            if v.Name == "ice" then
+            v.CustomPhysicalProperties = nil
+            end
+        end
+	end	  
+})
+
+Misc:AddButton({
+	Name = "Tool: Click to Teleport",
+	Default = false,
+	Callback = function(Value)
+		local plr = game:GetService("Players").LocalPlayer
+        local mouse = plr:GetMouse()
+		
+        local tool = Instance.new("Tool")
+        tool.RequiresHandle = false
+        tool.Name = "Click Teleport"
+		
+        tool.Activated:Connect(function()
+        local root = plr.Character.HumanoidRootPart
+        local pos = mouse.Hit.Position+Vector3.new(0,2.5,0)
+        local offset = pos-root.Position
+        root.CFrame = root.CFrame+offset
+        end)
+		
+        tool.Parent = plr.Backpack
+	end	  
+})
+
+--In Teleport Tab
+Teleport:AddParagraph("Legit Teleport","It is the teleport that uses the campfire (you must have this stage unlocked).")
+
+Teleport:AddButton({
+	Name = "Teleport: Start [0]",
+	Default = false,
+	Callback = function(Value)
+        game:GetService("ReplicatedStorage").Remotes.Teleport:FireServer("start")
+	end	  
+})
+
+Teleport:AddButton({
+	Name = "Teleport: Furia Castle [100]",
+	Default = false,
+	Callback = function(Value)
+        game:GetService("ReplicatedStorage").Remotes.Teleport:FireServer("castle")
+	end	  
+})
+
+Teleport:AddButton({
+	Name = "Teleport: The Town [200]",
+	Default = false,
+	Callback = function(Value)
+        game:GetService("ReplicatedStorage").Remotes.Teleport:FireServer("town")
+	end	  
+})
+
+Teleport:AddButton({
+	Name = "Teleport: Blue House [300]",
+	Default = false,
+	Callback = function(Value)
+        game:GetService("ReplicatedStorage").Remotes.Teleport:FireServer("bluehouse")
+	end	  
+})
+
+Teleport:AddButton({
+	Name = "Teleport: Royal Castle [400]",
+	Default = false,
+	Callback = function(Value)
+        game:GetService("ReplicatedStorage").Remotes.Teleport:FireServer("castle2")
+	end	  
+})
+
+Teleport:AddButton({
+	Name = "Teleport: Watch Tower [500]",
+	Default = false,
+	Callback = function(Value)
+        game:GetService("ReplicatedStorage").Remotes.Teleport:FireServer("watchtower")
+	end	  
+})
+
+Teleport:AddButton({
+	Name = "Teleport: Village [600]",
+	Default = false,
+	Callback = function(Value)
+        game:GetService("ReplicatedStorage").Remotes.Teleport:FireServer("village")
+	end	  
+})
+
+Teleport:AddButton({
+	Name = "Teleport: Molten Castle [700]",
+	Default = false,
+	Callback = function(Value)
+        game:GetService("ReplicatedStorage").Remotes.Teleport:FireServer("castle700m")
+	end	  
+})
+
+Teleport:AddButton({
+	Name = "Teleport: Wizard Tower [800]",
+	Default = false,
+	Callback = function(Value)
+        game:GetService("ReplicatedStorage").Remotes.Teleport:FireServer("wizardtower")
+	end	  
+})
+
+Teleport:AddParagraph("Teleport","It is the teleport that makes you fly (from the stage 'Molten Castle [700]' to the stage 'Wizard Tower [800]' is impossible, due to lava. In next updates I will improve that).")
+
+Teleport:AddButton({
+	Name = "Teleport: Start [0]",
+	Default = false,
+	Callback = function(Value)
+		Time = 3; target_pos = CFrame.new(-34, 1, 123) 
+        TweenI = TweenInfo.new(Time, Enum.EasingStyle.Linear) 
+        local tween1 = game:GetService('TweenService'):Create(game.Players.LocalPlayer.Character.HumanoidRootPart, TweenI, {CFrame = target_pos}) 
+        tween1:Play() --plays tween tp. 
+	end	  
+})
+
+Teleport:AddButton({
+	Name = "Teleport: Furia Castle [100]",
+	Default = false,
+	Callback = function(Value)
+        Time = 3; target_pos = CFrame.new(-65, 377, -495) 
+        TweenI = TweenInfo.new(Time, Enum.EasingStyle.Linear) 
+        local tween3 = game:GetService('TweenService'):Create(game.Players.LocalPlayer.Character.HumanoidRootPart, TweenI, {CFrame = target_pos}) 
+        tween3:Play() --plays tween tp. 
+	end	  
+})
+
+Teleport:AddButton({
+	Name = "Teleport: The Town [200]",
+	Default = false,
+	Callback = function(Value)
+        Time = 3; target_pos = CFrame.new(-450, 716, -318) 
+        TweenI = TweenInfo.new(Time, Enum.EasingStyle.Linear) 
+        local tween5 = game:GetService('TweenService'):Create(game.Players.LocalPlayer.Character.HumanoidRootPart, TweenI, {CFrame = target_pos}) 
+        tween5:Play() --plays tween tp. 
+	end	  
+})
+
+Teleport:AddButton({
+	Name = "Teleport: Blue House [300]",
+	Default = false,
+	Callback = function(Value)
+        Time = 3; target_pos = CFrame.new(-523, 1071, -125) 
+        TweenI = TweenInfo.new(Time, Enum.EasingStyle.Linear) 
+        local tween7 = game:GetService('TweenService'):Create(game.Players.LocalPlayer.Character.HumanoidRootPart, TweenI, {CFrame = target_pos}) 
+        tween7:Play() --plays tween tp. 
+	end	  
+})
+
+Teleport:AddButton({
+	Name = "Teleport: Royal Castle [400]",
+	Default = false,
+	Callback = function(Value)
+        Time = 3; target_pos = CFrame.new(-500, 1428, -520) 
+        TweenI = TweenInfo.new(Time, Enum.EasingStyle.Linear) 
+        local tween8 = game:GetService('TweenService'):Create(game.Players.LocalPlayer.Character.HumanoidRootPart, TweenI, {CFrame = target_pos}) 
+        tween8:Play() --plays tween tp. 
+	end	  
+})
+
+Teleport:AddButton({
+	Name = "Teleport: Watch Tower [500]",
+	Default = false,
+	Callback = function(Value)
+        Time = 3; target_pos = CFrame.new(-862, 1806, -726) 
+        TweenI = TweenInfo.new(Time, Enum.EasingStyle.Linear) 
+        local tween1 = game:GetService('TweenService'):Create(game.Players.LocalPlayer.Character.HumanoidRootPart, TweenI, {CFrame = target_pos}) 
+        tween1:Play() --plays tween tp. 
+	end	  
+})
+
+Teleport:AddButton({
+	Name = "Teleport: Village [600]",
+	Default = false,
+	Callback = function(Value)
+        Time = 3; target_pos = CFrame.new(-722, 2147, -564) 
+        TweenI = TweenInfo.new(Time, Enum.EasingStyle.Linear) 
+        local tween1 = game:GetService('TweenService'):Create(game.Players.LocalPlayer.Character.HumanoidRootPart, TweenI, {CFrame = target_pos}) 
+        tween1:Play() --plays tween tp. 
+	end	  
+})
+
+Teleport:AddButton({
+	Name = "Teleport: Molten Castle [700]",
+	Default = false,
+	Callback = function(Value)
+        Time = 3; target_pos = CFrame.new(-1507, 2498, -752) 
+        TweenI = TweenInfo.new(Time, Enum.EasingStyle.Linear) 
+        local tween3 = game:GetService('TweenService'):Create(game.Players.LocalPlayer.Character.HumanoidRootPart, TweenI, {CFrame = target_pos}) 
+        tween3:Play() --plays tween tp. 
+	end	  
+})
+
+Teleport:AddButton({
+	Name = "Teleport: Wizard Tower [800]",
+	Default = false,
+	Callback = function(Value)
+        Time = 3; target_pos = CFrame.new(-1405, 2859, -1327) 
+        TweenI = TweenInfo.new(Time, Enum.EasingStyle.Linear) 
+        local tween4 = game:GetService('TweenService'):Create(game.Players.LocalPlayer.Character.HumanoidRootPart, TweenI, {CFrame = target_pos}) 
+        tween4:Play() --plays tween tp. 
+	end	  
+})
+
+--In Credits Tab
+Credits:AddParagraph("Credits","The creator of ZapHub is (!! Zap#0759).")
+
+Credits:AddParagraph("Version","The current version of ZapHub is Beta 1.0.0.")
+
+Credits:AddParagraph("Discord","ZapHub's discord server is (discord.gg/zaphub).")
+
+--In Update Log Tab
+UpdateLog:AddParagraph("Version: Beta 1.0.0","•The following menus were added: Misc, Teleport, Credits and Update Log. •Added the following options in Misc: Fps Booster, Delete Fog, Non Slippery Ice and Click to Teleport. •Added the following teleport points in Teleport: From stage 1 (Start [0]) to stage 8 (Wizard Tower [800]). •Added credits in Credits. •Update Logs were added in Update Log.")
+
+ZapLib:Init()
